@@ -21,16 +21,34 @@ if ($conn === null) {
 
 // create size
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $size = $_POST['size'] ?? '';
-    $price = $_POST['price'] ?? '';
-    $product_id = $_POST['product_id'] ?? '';
-    $is_default = $_POST['is_default'] ?? 0;
-    $is_available = $_POST['is_available'] ?? 1;
+    $data = json_decode(file_get_contents("php://input"), true);
+
+    $size = $data['size'] ?? '';
+    $price = $data['price'] ?? '';
+    $product_id = $data['product_id'] ?? '';
+    $is_default = $data['is_default'] ?? 0;
+    $is_available = $data['is_available'] ?? 1;
 
     if (empty($size) || empty($price) || empty($product_id)) {
         echo json_encode(array(
             "status" => false,
             "message" => "Size, price, and product_id are required"
+        ));
+        exit();
+    }
+
+    // check if there is any size with the product_id and has default as true
+    $sql = "SELECT * FROM product_sizes WHERE product_id = :product_id AND is_default = 1";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bindParam(':product_id', $product_id);
+    $stmt->execute();
+    $defaultSize = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($is_default == 1 && $defaultSize) {
+        echo json_encode(array(
+            "status" => false,
+            "message" => "Default size already exists"
         ));
         exit();
     }
@@ -54,3 +72,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         "message" => "Method not allowed"
     ));
 }
+?>

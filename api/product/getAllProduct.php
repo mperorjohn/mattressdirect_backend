@@ -22,10 +22,14 @@ if ($conn === null) {
 // Check if the request method is GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Query to select all products and get defaul price from product_sizes table and join here as product_price
-    $sql = "SELECT products.*, product_sizes.price as product_price 
+    $sql = "SELECT products.*, 
+                   CASE 
+                       WHEN product_sizes.price IS NOT NULL THEN product_sizes.price 
+                       ELSE 'No default price available' 
+                   END as product_price 
             FROM products 
             LEFT JOIN product_sizes ON products.id = product_sizes.product_id 
-            WHERE product_sizes.is_default = 1 AND product_sizes.is_available = 1";
+            AND product_sizes.is_default = 1 AND product_sizes.is_available = 1 ORDER BY products.created_at DESC";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
 

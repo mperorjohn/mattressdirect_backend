@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $data->password;
 
         // Check if user exists
-        $sql = "SELECT id, first_name, last_name, email, phone, company_name, company_phone, country, state, city, postal_code, address, created_at, password FROM users WHERE email = :email";
+        $sql = "SELECT id, first_name, last_name,permission, email, phone, company_name, company_phone, country, state, city, postal_code, address, created_at, password FROM users WHERE email = :email";
         $stmt = $conn->prepare($sql);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
