@@ -5,14 +5,6 @@ header("Content-Type: application/json");
 
 include_once '../../config/database.php';
 
-// Database connection
-$databaseService = new DatabaseService();
-$conn = $databaseService->getConnection(
-    $_ENV['DB_HOST'],
-    $_ENV['DB_NAME'],
-    $_ENV['DB_USER'],
-    $_ENV['DB_PASSWORD']
-);
 
 // Check connection
 if ($conn === null) {
@@ -21,7 +13,7 @@ if ($conn === null) {
 
 // Check if the request method is GET
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Query to select all products and get defaul price from product_sizes table and join here as product_price
+    // Query to select all products and get default price from product_sizes table and join here as product_price
     $sql = "SELECT products.*, 
                    CASE 
                        WHEN product_sizes.price IS NOT NULL THEN product_sizes.price 
@@ -38,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     // Return products in JSON format
     echo json_encode(array(
-        "status" => true,
+        "status" => true,   
         "data" => $products
     ));
 } else {

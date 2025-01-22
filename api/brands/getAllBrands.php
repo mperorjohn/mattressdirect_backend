@@ -6,13 +6,13 @@ header("Content-Type: application/json");
 include_once '../../config/database.php';
 
 // Database connection
-$databaseService = new DatabaseService();
-$conn = $databaseService->getConnection(
-    $_ENV['DB_HOST'],
-    $_ENV['DB_NAME'],
-    $_ENV['DB_USER'],
-    $_ENV['DB_PASSWORD']
-);
+// $databaseService = new DatabaseService();
+// $conn = $databaseService->getConnection(
+//      $_ENV['DB_HOST'],
+//     $_ENV['DB_DATABASE'],  // Corrected from DB_NAME
+//     $_ENV['DB_USERNAME'],  // Corrected from DB_USER
+//     $_ENV['DB_PASSWORD']
+// );
 
 // Check connection
 if ($conn === null) {

@@ -6,13 +6,7 @@ header("Content-Type: application/json");
 include_once '../../config/database.php';
 
 // Database connection
-$databaseService = new DatabaseService();
-$conn = $databaseService->getConnection(
-    $_ENV['DB_HOST'],
-    $_ENV['DB_NAME'],
-    $_ENV['DB_USER'],
-    $_ENV['DB_PASSWORD']
-);
+global $conn; // Assuming $conn is defined in the included database.php
 
 // Check connection
 if ($conn === null) {
@@ -39,14 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     ON products.id = product_sizes.product_id 
     AND product_sizes.is_default = 1 
     AND product_sizes.is_available = 1
-    WHERE products.product_name LIKE :search 
-    OR products.product_description LIKE :search 
-    OR products.product_category LIKE :search
-    OR products.product_brand_name LIKE :search LIMIT 20" 
-    ;
+    WHERE products.product_name LIKE :search1 
+    OR products.product_description LIKE :search2 
+    OR products.product_category LIKE :search3
+    OR products.product_brand_name LIKE :search4 LIMIT 20";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':search', $search);
+    $stmt->bindParam(':search1', $search);
+    $stmt->bindParam(':search2', $search);
+    $stmt->bindParam(':search3', $search);
+    $stmt->bindParam(':search4', $search);
     $stmt->execute();
 
     // Fetch products matching the search term

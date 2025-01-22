@@ -8,9 +8,9 @@ include_once '../../config/database.php';
 // Database connection
 $databaseService = new DatabaseService();
 $conn = $databaseService->getConnection(
-    $_ENV['DB_HOST'],
-    $_ENV['DB_NAME'],
-    $_ENV['DB_USER'],
+     $_ENV['DB_HOST'],
+    $_ENV['DB_DATABASE'],  // Corrected from DB_NAME
+    $_ENV['DB_USERNAME'],  // Corrected from DB_USER
     $_ENV['DB_PASSWORD']
 );
 
@@ -37,35 +37,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // check if there is any size with the product_id and has default as true
-    $sql = "SELECT * FROM product_sizes WHERE product_id = :product_id AND is_default = 1";
+    try {
+        // check if there is any size with the product_id and has default as true
+        $sql = "SELECT * FROM product_sizes WHERE product_id = :product_id AND is_default = 1";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->execute();
+        $defaultSize = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':product_id', $product_id);
-    $stmt->execute();
-    $defaultSize = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($is_default == 1 && $defaultSize) {
+            echo json_encode(array(
+                "status" => false,
+                "message" => "Default size already exists"
+            ));
+            exit();
+        }
 
-    if ($is_default == 1 && $defaultSize) {
+        $sql = "INSERT INTO product_sizes (size, price, product_id, is_default, is_available) VALUES (:size, :price, :product_id, :is_default, :is_available)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam(':size', $size);
+        $stmt->bindParam(':price', $price);
+        $stmt->bindParam(':product_id', $product_id);
+        $stmt->bindParam(':is_default', $is_default);
+        $stmt->bindParam(':is_available', $is_available);
+        $stmt->execute();
+
+        echo json_encode(array(
+            "status" => true,
+            "message" => "Size created successfully"
+        ));
+    } catch (Exception $e) {
         echo json_encode(array(
             "status" => false,
-            "message" => "Default size already exists"
+            "message" => "Error: " . $e->getMessage()
         ));
-        exit();
     }
-
-    $sql = "INSERT INTO product_sizes (size, price, product_id, is_default, is_available) VALUES (:size, :price, :product_id, :is_default, :is_available)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':size', $size);
-    $stmt->bindParam(':price', $price);
-    $stmt->bindParam(':product_id', $product_id);
-    $stmt->bindParam(':is_default', $is_default);
-    $stmt->bindParam(':is_available', $is_available);
-    $stmt->execute();
-
-    echo json_encode(array(
-        "status" => true,
-        "message" => "Size created successfully"
-    ));
 } else {
     echo json_encode(array(
         "status" => false,

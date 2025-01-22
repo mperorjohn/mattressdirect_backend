@@ -33,3 +33,7 @@ try {
 } catch (Exception $e) {
     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 }
+
+
+// sudo chmod 755 /var/www/html/mattress/mattressdirect_backend/uploads/
+// sudo chown www-data:www-data /var/www/html/mattress/mattressdirect_backend/uploads/
